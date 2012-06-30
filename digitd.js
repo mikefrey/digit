@@ -3,7 +3,7 @@ var VERSION = '0.1'
 
 
 var commander = require('commander')
-var git = require('gitteh')
+//var git = require('gitteh')
 var path = require('path')
 var spawn = require('child_process').spawn
 
@@ -19,22 +19,22 @@ console.log('digit daemon v%s', VERSION)
 console.log('repository location: %s', repoPath)
 
 
-git.openRepository(path.join(repoPath, '.git'), function(err, repo) {
-  var head = repo.getReference('HEAD')
-  head = head.resolve()
-  var walker = repo.createWalker()
-  walker.sort(git.GIT_SORT_TIME)
-  walker.push(head.target)
+// git.openRepository(path.join(repoPath, '.git'), function(err, repo) {
+//   var head = repo.getReference('HEAD')
+//   head = head.resolve()
+//   var walker = repo.createWalker()
+//   walker.sort(git.GIT_SORT_TIME)
+//   walker.push(head.target)
 
-  var commit, i = 0
-  while (commit = walker.next()) {
-    console.log('%s %s - %s',
-      commit.id.substring(0,7),
-      commit.author.name,
-      commit.message.replace(/\n/, '').substring(0,30))
-    if (i++ > 30) break
-  }
-})
+//   var commit, i = 0
+//   while (commit = walker.next()) {
+//     console.log('%s %s - %s',
+//       commit.id.substring(0,7),
+//       commit.author.name,
+//       commit.message.replace(/\n/, '').substring(0,30))
+//     if (i++ > 30) break
+//   }
+// })
 
 
 // perform a git pull
