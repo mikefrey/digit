@@ -2,18 +2,48 @@
 var path = require('path')
 var Git = require('../lib/git.js')
 
-function createBadRepo() {
-  new Git.Repository('/badPath')
-}
-
 exports.git = {
+
+  setUp: function(fn) { fn() },
+  tearDown: function(fn) { fn() },
+
+  'Git': {
+
+    setUp: function(fn) { fn() },
+
+    tearDown: function(fn) { fn() },
+
+    nonExistantPath: function(test) {
+      //test.expect(2)
+        test.done()
+      // Git.openRepository('/badRepoPath/random/sdjk9393kdkdflksjf', function(err, repo) {
+      //   // test.strictEqual(err, 'Directory does not exist', 'should respond with an error')
+      //   // test.ok(!repo, 'repository should be falsy')
+      //   console.log('test ran')
+      //   test.done()
+      // })
+    }//,
+
+    // nonRepoPath: function(test) {
+    //   test.expect(2)
+    //   Git.openRepository(__dirname, function(err, repo) {
+    //     test.strictEqual(err, 'Git repo does not exist', 'should respond with an error')
+    //     test.ok(!repo, 'repository should be falsey')
+    //     test.done()
+    //   })
+    // }
+
+  },
 
   'Repository': {
 
     setUp: function(fn) {
       this.repoPath = path.resolve(__dirname, '../')
-      this.repo = new Git.Repository(this.repoPath)
-      fn()
+      Git.openRepository(this.repoPath, function(err, repo) {
+        console.log(err, repo)
+        this.repo = repo
+        fn()
+      })
     },
 
     tearDown: function(fn) {
@@ -21,11 +51,10 @@ exports.git = {
     },
 
     init: function(test) {
-      test.expect(3)
-      test.ok(!!Git.Repository, 'class should exist')
+      console.log(this, this.repo)
+      test.expect(2)
       test.ok(this.repo instanceof Git.Repository, 'instance should be instance of \'Git.Repository\'')
       test.strictEqual(this.repo.path, this.repoPath, 'repository path should be set correctly')
-      //test.throws(createBadRepo, 'Git repo does not exist', 'should throw if repo does not exist')
       test.done()
     },
 
