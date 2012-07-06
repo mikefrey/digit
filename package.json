@@ -6,7 +6,8 @@
   "author": "Mike Frey <frey.mike@gmail.com>, Blago Dachev, <blago@dachev.com>",
   "repository": { "type": "git", "url": "https://github.com/mikefrey/digit.git" }  ,
   "dependencies": {
-    "commander": ">= 0.6.0"
+    "commander": ">= 0.6.0",
+    "sqlite3": "2.1.5"
   },
   "devDependencies": {},
   "scripts": {},

@@ -1,21 +1,67 @@
-var VERSION = '0.1'
+var _ = require('underscore')
+var git = require('../lib/git')
+var db = require('../lib/db')
+var conf = require('../lib/configurator')
+
+
+var defaults = {
+  repoPath: './',
+  interval: 300*1000
+}
+var options = {}
+
+var stepTimeout = 0
+var repository
+
+
+/*
+ * start the daemon
+ */
+
+function start() {
+  // get configuration settings
+  options = conf.getConfiguration(defaults)
+
+  // validate and open the repo
+  git.openRepository(options.repoPath, function(err, repo) {
+    if (err) throw err
+    repository = repo
+
+    // initialize the database
+    db.initialize('digit.db', function(err) {
+      if (err) throw err
+      stepTimeout = setTimout(step, options.interval)
+    })
+
+  })
+}
+
+
+/*
+ * initiates the check/analysis loop iteration
+ */
+
+function step() {
+
+  if (!repository) return
+  repository.commits(function(err, commits) {
+    db.getLatestCommit()
+  })
+}
+
+
+
+
+function getLatestCommitHashes() {}
+
+
+
+
 
 var dd = {
-
-  repoPath: './',
-  interval: 300 * 1000,
-
-  start: function() {
-    console.log('digit daemon v%s', VERSION)
-    console.log('repository location: %s', dd.repoPath)
-
-    dd.timeout = setTimout(dd.check, dd.interval)
-  },
-
-  check: function() {
-
-  }
-
+  start: start,
+  //check: check,
+  configure: conf.configure
 }
 
 

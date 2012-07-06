@@ -1,12 +1,14 @@
+#!/usr/bin/env node
 
-
-
+var VERSION = '0.1'
 
 var commander = require('commander')
-//var git = require('gitteh')
 var path = require('path')
+var dd = require('./daemon/digitd')
+
 // var spawn = require('child_process').spawn
-var git = require('./lib/git')
+//var git = require('./lib/git')
+
 
 
 commander
@@ -18,11 +20,22 @@ commander
 
 var repoPath = path.resolve(__dirname, commander.repo)
 
+console.log('digit daemon v%s', VERSION)
+console.log('repository location: %s', dd.repoPath)
 
 
-git.openRepository('../digit', function(err, repo) {
-  repo.commits();
+dd.configure(function(options) {
+  options.repoPath = repoPath
+  return options
 })
+
+dd.start()
+
+
+
+// git.openRepository('../digit', function(err, repo) {
+//   repo.commits();
+// })
 
 
 
