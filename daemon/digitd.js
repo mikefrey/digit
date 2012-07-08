@@ -13,9 +13,13 @@ var options = {}
 var stepTimeout = 0
 var repository
 
+var latestCommit = ''
 
-/*
- * start the daemon
+
+/**
+ * Start the daemon
+ *
+ * @api public
  */
 
 function start() {
@@ -37,22 +41,55 @@ function start() {
 }
 
 
-/*
- * initiates the check/analysis loop iteration
+/**
+ * Initiate the check/analysis loop iteration
+ *
+ * @api private
  */
 
 function step() {
-
   if (!repository) return
-  repository.commits(function(err, commits) {
-    db.getLatestCommit()
-  })
+
+  if (!latestCommit)
+    db.getLatestCommit(function(err, commits) {
+      if (!err && commits && commits.length > 0)
+        latestCommit = commits[0].hash
+      getLatestCommitHashes(latestCommit)
+    })
+  else
+    getLatestCommitHashes(latestCommit)
 }
 
 
 
+/**
+ *
+ *
+ */
 
-function getLatestCommitHashes() {}
+function getLatestCommitHashes(latest) {
+  repository.commits(latest, function(err, commits) {
+    _.each(commits, processCommmit)
+  })
+}
+
+/**
+ *
+ *
+ */
+
+function processCommit(commit) {
+
+}
+
+/**
+ *
+ *
+ */
+
+function saveCommit(commit) {
+
+}
 
 
 
