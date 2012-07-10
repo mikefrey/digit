@@ -1,4 +1,5 @@
 var _ = require('underscore')
+var async = require('async')
 var git = require('../lib/git')
 var db = require('../lib/db')
 var conf = require('../lib/configurator')
@@ -13,7 +14,7 @@ var options = {}
 var stepTimeout = 0
 var repository
 
-var latestCommit = ''
+var lastCommitHash = ''
 
 
 /**
@@ -50,14 +51,14 @@ function start() {
 function step() {
   if (!repository) return
 
-  if (!latestCommit)
+  if (!lastCommitHash)
     db.getLatestCommit(function(err, commits) {
       if (!err && commits && commits.length > 0)
-        latestCommit = commits[0].hash
-      getLatestCommitHashes(latestCommit)
+        lastCommitHash = commits[0].hash
+      getLatestCommits(lastCommitHash)
     })
   else
-    getLatestCommitHashes(latestCommit)
+    getLatestCommits(lastCommitHash)
 }
 
 
@@ -67,9 +68,15 @@ function step() {
  *
  */
 
-function getLatestCommitHashes(latest) {
-  repository.commits(latest, function(err, commits) {
-    _.each(commits, processCommmit)
+function getLatestCommits(last) {
+  async.series({
+    pull: repository.pull,
+    commits: function(cb) { repository.commits(last, cb)
+  },
+  function(err, results) {
+    if (err) return console.log(err)
+    _.each(results.commits, processCommmit)
+    _.each(results.commits, saveCommmit)
   })
 }
 
@@ -79,7 +86,11 @@ function getLatestCommitHashes(latest) {
  */
 
 function processCommit(commit) {
-
+  commit.score = 1
+  var bugRx = /bug|fixed|helpspot|hs\#/i
+  if (bugRx.test(commit.message)) {
+    commit.score += 4
+  }
 }
 
 /**
@@ -88,7 +99,7 @@ function processCommit(commit) {
  */
 
 function saveCommit(commit) {
-
+  db.
 }
 
 

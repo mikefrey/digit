@@ -2,15 +2,26 @@
   "name": "digit",
   "version": "0.1.0",
   "description": "dig through your git repository looking for 'hot' files",
-  "keywords": ["code", "git", "repo", "repository"],
+  "keywords": [
+    "code",
+    "git",
+    "repo",
+    "repository"
+  ],
   "author": "Mike Frey <frey.mike@gmail.com>, Blago Dachev, <blago@dachev.com>",
-  "repository": { "type": "git", "url": "https://github.com/mikefrey/digit.git" }  ,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikefrey/digit.git"
+  },
   "dependencies": {
     "commander": ">= 0.6.0",
-    "sqlite3": "2.1.5"
+    "sqlite3": "2.1.5",
+    "async": "~0.1.22"
   },
   "devDependencies": {},
   "scripts": {},
   "main": "digitd",
-  "engines": { "node": ">= 0.6.x" }
+  "engines": {
+    "node": ">= 0.6.x"
+  }
 }
