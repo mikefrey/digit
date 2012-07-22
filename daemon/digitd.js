@@ -71,12 +71,16 @@ function step() {
 function getLatestCommits(last) {
   async.series({
     pull: repository.pull,
-    commits: function(cb) { repository.commits(last, cb)
+    commits: function(cb) { repository.commits(last, cb) }
   },
   function(err, results) {
     if (err) return console.log(err)
-    _.each(results.commits, processCommmit)
-    _.each(results.commits, saveCommmit)
+    async.series([
+      async.apply(async.forEach, results.commits, processCommit),
+      async.apply(async.forEach, results.commits, saveCommit)
+    ])
+    // async.forEach(results.commits, processCommmit, function(){})
+    // async.forEach(results.commits, saveCommmit, function(){})
   })
 }
 
@@ -85,12 +89,14 @@ function getLatestCommits(last) {
  *
  */
 
-function processCommit(commit) {
+function processCommit(commit, cb) {
   commit.score = 1
   var bugRx = /bug|fixed|helpspot|hs\#/i
   if (bugRx.test(commit.message)) {
     commit.score += 4
   }
+
+  cb()
 }
 
 /**
@@ -98,8 +104,11 @@ function processCommit(commit) {
  *
  */
 
-function saveCommit(commit) {
-  db.
+function saveCommit(commit, cb) {
+  async.waterfall([
+    db.saveCommit(commit, cb)
+
+  ])
 }
 
 

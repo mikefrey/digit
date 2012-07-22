@@ -1,4 +1,7 @@
-var sqlite3  = require('sqlite3')
+
+
+exports.run = run
+
 var database = null
 
 var migrations = [
@@ -7,22 +10,24 @@ var migrations = [
   {up:createFileCommitTableUp, dn:createFileCommitTableDn}
 ]
 
-// initialization
-function initialize(file, cb) {
-  if (database != null) { return }
 
-  database = new sqlite3.Database(file, function (err) {
+
+function run(db, cb) {
+  if (database) return cb()
+
+  database = db
+
+  getRevision(function(err, version) {
     if (err) { return cb(err) }
 
-    getRevision(function(err, version) {
-      if (err) { return cb(err) }
-
-      executeMigrations(migrations, version, migrations.length, function(err) {
-        cb(err)
-      })
+    executeMigrations(migrations, version, migrations.length, function(err) {
+      cb(err)
     })
   })
 }
+
+
+
 
 function getRevision(cb) {
   var sql = 'SELECT version FROM revisions where name=\'schema\''
@@ -167,73 +172,4 @@ function createFileCommitTableDn(database, cb) {
     cb(err)
   })
 }
-
-
-
-
-
-
-// DATA ACCESS
-
-
-/**
- *
- *
- *
- */
-
-function saveCommit(commit, cb) {
-  var sql  = 'INSERT OR REPLACE INTO commit (hash, timestamp, message, score) VALUES(?, ?, ?, ?, ?)'
-  var args = [commit.hash, commit.timestamp, commit.message, commit.score]
-  database.query(sql, args, function (err) {
-    return cb(err)
-  })
-}
-
-/**
- *
- *
- *
- */
-
-function loadCommits(ids, cb) {
-  var sql = "SELECT * FROM commit WHERE hash IN('" + ids.join("', '") + "')"
-  database.query(sql, [], function (err, rows) {
-    return cb(err, rows)
-  })
-}
-
-/**
- *
- *
- *
- */
-
-function getLatestCommit(cb) {
-  var sql = 'SELECT * FROM commit ORDER BY timestamp DESC LIMIT 1'
-  database.query(sql, [], function(err, rows) }
-    return cb(err, rows[0])
-  })
-}
-
-/**
- *
- *
- *
- */
-
-function saveFile(file, commit, cb) {
-  var sql  = 'INSERT OR REPLACE INTO file (path, score, ) VALUES(?, ?)'
-  var args = [file, commit.score]
-  database.query(sql, args, function (err) {
-    return cb(err)
-  })
-}
-
-
-// exports
-module.exports.initialize = initialize
-module.exports.saveCommit  = saveCommit
-module.exports.loadCommits = loadCommits
-module.exports.getLatestCommit = getLatestCommit
 
